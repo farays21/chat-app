@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
-import { redis } from '@/lib/redis';
+import { getRedis } from '@/lib/redis';
 import { sanitizeUsername } from '@/lib/utils';
 
 export async function POST(req: Request, { params }: { params: { roomId: string } }) {
   try {
+    const redis = getRedis();
     const { roomId } = params;
     const { username } = await req.json();
     if (!username) return NextResponse.json({ error: 'Username required' }, { status: 400 });

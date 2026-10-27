@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { redis } from '@/lib/redis';
+import { getRedis } from '@/lib/redis';
 
 export const dynamic = 'force-dynamic';
 
@@ -7,6 +7,7 @@ export async function GET(req: Request, { params }: { params: { roomId: string }
   const { roomId } = params;
 
   try {
+    const redis = getRedis();
     const pipeline = redis.pipeline();
     pipeline.lrange(`room:${roomId}:messages`, -50, -1);
     pipeline.hgetall(`room:${roomId}:users`);
@@ -37,11 +38,7 @@ export async function GET(req: Request, { params }: { params: { roomId: string }
 
     return NextResponse.json(data);
   } catch (error: unknown) {
-    console.error('Events error:', {
-      roomId,
-      error: error instanceof Error ? error.message : String(error),
-      stack: error instanceof Error ? error.stack : undefined,
-    });
+    console.error('Events error:', error);
     return NextResponse.json({ error: 'Failed to fetch events' }, { status: 500 });
   }
 }

@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
-import { redis } from '@/lib/redis';
+import { getRedis } from '@/lib/redis';
 import { generateRoomId, sanitizeUsername } from '@/lib/utils';
 
 export async function POST(req: Request) {
   try {
+    const redis = getRedis();
     const { username } = await req.json();
     if (!username) return NextResponse.json({ error: 'Username required' }, { status: 400 });
 
@@ -22,7 +23,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ roomId });
   } catch (error: unknown) {
-    console.error('Create room error:', error);
+    console.error('[create] error:', error);
     return NextResponse.json({ error: 'Failed to create room' }, { status: 500 });
   }
 }

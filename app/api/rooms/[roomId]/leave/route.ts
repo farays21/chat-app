@@ -1,11 +1,12 @@
 import { NextResponse } from 'next/server';
-import { redis } from '@/lib/redis';
+import { getRedis } from '@/lib/redis';
 import { sanitizeUsername } from '@/lib/utils';
 
 export async function POST(req: Request, { params }: { params: { roomId: string } }) {
   const { roomId } = params;
   
   try {
+    const redis = getRedis();
     let body: { username?: string } = {};
     
     try {
@@ -36,11 +37,7 @@ export async function POST(req: Request, { params }: { params: { roomId: string 
 
     return NextResponse.json({ success: true, removed: result });
   } catch (error: unknown) {
-    console.error('Leave room error:', {
-      roomId,
-      error: error instanceof Error ? error.message : String(error),
-      stack: error instanceof Error ? error.stack : undefined,
-    });
+    console.error('Leave room error:', error);
     return NextResponse.json({ error: 'Failed to leave room' }, { status: 500 });
   }
 }
